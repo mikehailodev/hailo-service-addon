@@ -36,5 +36,26 @@ echo "[diag] Running hailortcli fw-control identify..."
 hailortcli fw-control identify 2>&1 || true
 
 echo "Starting HailoRT service..."
-echo "[diag] Exec: hailort_service"
-exec hailort_service
+echo "[diag] hailort_service will fork to background (Type=forking)"
+
+# hailort_service forks to background and writes PID to /run/hailo/hailort_service.pid
+mkdir -p /run/hailo
+hailort_service
+
+# Wait for PID file
+sleep 1
+if [ -f /run/hailo/hailort_service.pid ]; then
+    PID=$(cat /run/hailo/hailort_service.pid)
+    echo "[diag] hailort_service started with PID ${PID}"
+    echo "[diag] Socket dir: $(ls -la ${SOCK_DIR}/ 2>&1)"
+    # Keep the container alive by waiting on the daemon process
+    while kill -0 "${PID}" 2>/dev/null; do
+        sleep 5
+    done
+    echo "ERROR: hailort_service (PID ${PID}) exited unexpectedly"
+    exit 1
+else
+    echo "ERROR: PID file not found at /run/hailo/hailort_service.pid"
+    echo "[diag] /run/hailo contents: $(ls -la /run/hailo/ 2>&1)"
+    exit 1
+fi
