@@ -3,10 +3,14 @@ FROM ${BUILD_FROM}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Extract HailoRT binaries from .deb without running postinst (needs systemctl)
+# Extract HailoRT binaries from .deb (extract to temp dir to avoid overwriting system files)
 COPY hailort_4.23.0_arm64.deb /tmp/hailort.deb
-RUN dpkg-deb -x /tmp/hailort.deb / \
-    && rm -f /tmp/hailort.deb \
+RUN mkdir /tmp/hailort \
+    && dpkg-deb -x /tmp/hailort.deb /tmp/hailort \
+    && cp /tmp/hailort/usr/lib/libhailort.so* /usr/lib/ \
+    && cp /tmp/hailort/usr/local/bin/hailort_service /usr/local/bin/ \
+    && cp /tmp/hailort/usr/bin/hailortcli /usr/bin/ \
+    && rm -rf /tmp/hailort /tmp/hailort.deb \
     && ldconfig
 
 COPY run.sh /run.sh
