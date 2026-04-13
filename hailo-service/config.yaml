@@ -14,7 +14,6 @@ host_ipc: true
 devices:
   - /dev/hailo0
 map:
-  - type: share
-    read_only: false
+  - share:rw
 options: {}
 schema: {}
