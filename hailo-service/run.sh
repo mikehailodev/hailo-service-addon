@@ -17,8 +17,8 @@ echo "[diag] /dev/shm: $(ls /dev/shm/ 2>&1 || echo 'NOT AVAILABLE')"
 
 SOCK_DIR="/share/hailo"
 mkdir -p "${SOCK_DIR}"
-export HAILO_SOCK_PATH="${SOCK_DIR}"
-echo "[diag] HAILO_SOCK_PATH=${HAILO_SOCK_PATH}"
+export HAILORT_SERVICE_ADDRESS="unix:${SOCK_DIR}/hailort_service.sock"
+echo "[diag] HAILORT_SERVICE_ADDRESS=${HAILORT_SERVICE_ADDRESS}"
 echo "[diag] Socket dir contents: $(ls -la "${SOCK_DIR}" 2>&1)"
 
 # Verify device
