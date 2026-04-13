@@ -1,10 +1,13 @@
 FROM debian:bookworm-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install pre-built HailoRT from .deb (includes hailort_service, hailortcli, libhailort)
+# Use dpkg directly to skip the interactive "accept service" prompt
 COPY hailort_4.23.0_arm64.deb /tmp/hailort.deb
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash \
-    /tmp/hailort.deb \
+RUN apt-get update && apt-get install -y --no-install-recommends bash \
+    && dpkg -i /tmp/hailort.deb || true \
+    && apt-get install -yf --no-install-recommends \
     && rm -f /tmp/hailort.deb \
     && rm -rf /var/lib/apt/lists/* \
     && ldconfig
