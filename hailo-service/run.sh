@@ -31,6 +31,40 @@ fi
 
 echo "Device /dev/hailo0 found."
 
+# Verify HailoRT version match (kernel driver vs userspace library)
+KERNEL_VERSION=""
+LIB_VERSION=""
+if [ -f /sys/module/hailo_pci/version ]; then
+    KERNEL_VERSION=$(cat /sys/module/hailo_pci/version)
+    echo "[diag] Kernel module (hailo_pci) version: ${KERNEL_VERSION}"
+else
+    echo "[warn] Cannot read /sys/module/hailo_pci/version — skipping version check"
+fi
+
+LIB_SO=$(ls /usr/lib/libhailort.so.*.*.* 2>/dev/null | head -1)
+if [ -n "${LIB_SO}" ]; then
+    LIB_VERSION=$(echo "${LIB_SO}" | grep -oP '\d+\.\d+\.\d+$')
+    echo "[diag] Userspace library (libhailort) version: ${LIB_VERSION}"
+else
+    echo "[warn] Cannot find libhailort.so.x.y.z — skipping version check"
+fi
+
+if [ -n "${KERNEL_VERSION}" ] && [ -n "${LIB_VERSION}" ]; then
+    if [ "${KERNEL_VERSION}" != "${LIB_VERSION}" ]; then
+        echo "============================================"
+        echo " ERROR: HailoRT version mismatch!"
+        echo " Kernel driver (hailo_pci): v${KERNEL_VERSION}"
+        echo " Userspace (libhailort):    v${LIB_VERSION}"
+        echo ""
+        echo " HailoRT requires an exact version match."
+        echo " Ensure HAOS and this add-on use the same"
+        echo " HailoRT version."
+        echo "============================================"
+        exit 1
+    fi
+    echo "[OK] HailoRT versions match: v${KERNEL_VERSION}"
+fi
+
 # Identify device
 echo "[diag] Running hailortcli fw-control identify..."
 hailortcli fw-control identify 2>&1 || true
