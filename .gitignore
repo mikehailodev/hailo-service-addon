@@ -1,2 +1,3 @@
-# HailoRT build artifacts (local dev only)
-hailo-service/hailort_artifacts/*.deb
+# HailoRT build artifacts
+# For public release: remove .deb files from git and download from official URLs in Dockerfile
+# hailo-service/hailort_artifacts/*.deb
