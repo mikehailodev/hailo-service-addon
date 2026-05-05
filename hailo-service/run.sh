@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+# Read version from installed library
+HAILORT_VERSION=$(ls /usr/lib/libhailort.so.*.*.* 2>/dev/null | grep -oP '\d+\.\d+\.\d+$' | head -1)
+HAILORT_VERSION="${HAILORT_VERSION:-unknown}"
+
 echo "============================================"
-echo " Hailo Service Add-on v4.23.0"
+echo " Hailo Service Add-on (HailoRT ${HAILORT_VERSION})"
 echo "============================================"
 
 # ── Diagnostics ──

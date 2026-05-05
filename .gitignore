@@ -1,0 +1,2 @@
+# HailoRT build artifacts (local dev only)
+hailo-service/hailort_artifacts/*.deb
